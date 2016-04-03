@@ -36,9 +36,10 @@ yrRide<-yrRide[order(yrRide$Change1115),]
 yrRide<-yrRide[order(yrRide$Station),]
 
 Locs$NAME<-ifelse(Locs$NAME=="Ronald Reagan Washington National Airport","Reagan Washington National Airport",
-                  Locs$NAME)
+                  ifelse(Locs$NAME=="LEnfant Plaza","L'Enfant Plaza",
+                  Locs$NAME))
 Locs<-Locs[order(Locs$NAME),]
-RidebyStation<-cbind(yrRide,Locs)[-c(11)]
+RidebyStation<-cbind(yrRide,Locs)[c(-11)]
 write.csv(RidebyStation,"StationAnnualRidership.csv")
 RidebyStation<-RidebyStation[order(RidebyStation$Change1115),]
 
@@ -99,5 +100,6 @@ perTrend$Change1115<-((perTrend$Yr15-perTrend$Yr11)/perTrend$Yr11)*100
 perTrend<-perTrend[order(perTrend$Change1115),]
 perTrend$Change1115<-round(perTrend$Change1115,2)
 perTrend$Yr15<-round(perTrend$Yr15,2)
+perTrend$Yr15T<-perTrend$Yr15/1000
 perTrend<-perTrend[c(5,3,4,2,1),]
 write.csv(perTrend,"RidebyPeriod.csv")
