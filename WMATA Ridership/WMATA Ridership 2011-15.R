@@ -101,5 +101,6 @@ perTrend<-perTrend[order(perTrend$Change1115),]
 perTrend$Change1115<-round(perTrend$Change1115,2)
 perTrend$Yr15<-round(perTrend$Yr15,2)
 perTrend$Yr15T<-perTrend$Yr15/1000
+perTrend$fullName<-c("AM Peak<br>5-9:30","Midday<br>9:30-3","PM Peak<br>3-7","Evening<br>7-9:30","Late Night Peak<br>9:30-close")
 perTrend<-perTrend[c(5,3,4,2,1),]
 write.csv(perTrend,"RidebyPeriod.csv")
