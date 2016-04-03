@@ -76,7 +76,7 @@ period$LateNightProp<-prop(period$LateNightPeak)
 period$MiddayProp<-prop(period$Midday)
 period$PMPeakProp<-prop(period$PMPeak)
 
-period<-period[order(period)]
+period<-period[order(period),]
 
 #2011-15 decline by periods
 Time1115<-subset(Time,Time$year %in% c("2011","2015"))
@@ -99,4 +99,5 @@ perTrend$Change1115<-((perTrend$Yr15-perTrend$Yr11)/perTrend$Yr11)*100
 perTrend<-perTrend[order(perTrend$Change1115),]
 perTrend$Change1115<-round(perTrend$Change1115,2)
 perTrend$Yr15<-round(perTrend$Yr15,2)
+perTrend<-perTrend[c(5,3,4,2,1),]
 write.csv(perTrend,"RidebyPeriod.csv")
