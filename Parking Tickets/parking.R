@@ -4,6 +4,11 @@ library(data.table)
 library(plyr)
 library (dplyr)
 library(rgdal)
+library(reshape)
+
+###Read in Parking Ticket Data and Create Single 2013-15 dataset###
+###Read in Parking Ticket Data and Create Single 2013-15 dataset###
+###Read in Parking Ticket Data and Create Single 2013-15 dataset###
 readIn<-function(url) {
   dataIn<-geojson_read(url,method = "local",parse = TRUE)
   df <- data.frame(matrix(unlist(dataIn$features$properties),nrow=length(dataIn$features$properties[[1]])))
@@ -85,36 +90,66 @@ tickets$fineN<-as.numeric(gsub("\\$","",tickets$fine))
 tickets$year<-substr(tickets$TICKET_ISSUE_DATE,1,4)
 table(tickets$year)
 
+###Aggregate by State ###
+###Aggregate by State ###
+###Aggregate by State ###
 countByState<-ddply(tickets, c("year","RP_PLATE_STATE"), nrow)
 colnames(countByState)<-c("Year","State","Tickets")
 fineByState<-aggregate(tickets$fineN, by=list(Category=tickets$year,tickets$RP_PLATE_STATE), FUN=sum,na.rm=TRUE)
 colnames(fineByState)<-c("Year","State","Fines")
 ticketsByState<-merge(countByState,fineByState,by=c("Year","State"))
-
-carCounts<-read.csv("totalVehicleReg14.csv",
-                stringsAsFactors=FALSE, strip.white=TRUE,header=FALSE)
-colnames(carCounts)<-c("State","Vehicles")
-carCounts<-subset(carCounts,carCounts$State!="")
-state<-as.data.frame(cbind(state.name,state.abb))
-DC<-data.frame(t(unlist(c("District of Columbia","DC"))))
-colnames(DC)<-c("state.name","state.abb")
-state<-rbind(state,DC)
-state$state.name<-as.character(state$state.name)
-state<-state[order(state$state.name),]
-CarCountSt<-cbind(carCounts,state)[c(2:4)]
-CarCountSt$Vehicles<-as.numeric(gsub(",","",CarCountSt$Vehicles))
-colnames(CarCountSt)[c(3)]<-"State"
-
-ticketsByState<-merge(ticketsByState,CarCountSt,by="State")
-
 write.csv(ticketsByState,"parkingTicketsSummary.csv",row.names=FALSE)
 
-Graph12<-subset(ticketsByState,ticketsByState$State=="DC" | ticketsByState$State=="VA" | ticketsByState$State=="MD")
-Graph12$state.name<-ifelse(Graph12$state.name=="District of Columbia","DC",Graph12$state.name)
-write.csv(Graph12,"Graph12.csv",row.names=FALSE)
+###Bring in Population###
+###Bring in Population###
+###Bring in Population###
+VApop<-read.csv("VA County Populations.csv",
+                stringsAsFactors=FALSE, strip.white=TRUE,header=FALSE)
+VApop<-subset(VApop,VApop$V3=="Arlington County, Virginia" | VApop$V3=="Fairfax County, Virginia" | 
+                VApop$V3=="Alexandria city, Virginia"| VApop$V3=="Fairfax city, Virginia"| 
+                VApop$V3=="Falls Church city, Virginia")[c(9:11)]
+cols = c(1:3);    
+VApop[,cols] = apply(VApop[,cols], 2, function(x) as.numeric(x));
+VAtotal<-colSums(VApop)
 
-map<-aggregate(list(Tickets=ticketsByState$Tickets,Fines=ticketsByState$Fines,Vehicles=ticketsByState$Vehicles),
+MDpop<-read.csv("MD County Populations.csv",
+                stringsAsFactors=FALSE, strip.white=TRUE,header=FALSE)
+MDpop<-subset(MDpop,MDpop$V3=="Montgomery County, Maryland" | MDpop$V3=="Prince George's County, Maryland")[c(9:11)]  
+MDpop[,cols] = apply(MDpop[,cols], 2, function(x) as.numeric(x));
+MDtotal<-colSums(MDpop)
+
+DCpop<-read.csv("DC Population.csv",
+                stringsAsFactors=FALSE, strip.white=TRUE,header=FALSE)[3,c(9:11)]
+areaPop<-as.data.frame(rbind(MDtotal,VAtotal,DCpop))
+colnames(areaPop)<-c("pop2013","pop2014","pop2015")
+areaPop$State<-c("MD","VA","DC")
+areaT<-melt(areaPop, id=c("State"))
+colnames(areaT)<-c("State","Year","Pop")
+areaT$Year<-gsub("pop","",areaT$Year)
+
+###Create mini datasets for viz###
+###Create mini datasets for viz###
+###Create mini datasets for viz###
+Graph1<-subset(ticketsByState,ticketsByState$State=="DC" | ticketsByState$State=="VA" | ticketsByState$State=="MD")[c(3,4,7)]
+Graph1<-melt(Graph1,id.vars=c("state.name","Year"))
+Graph1<- cast(Graph1,Year~state.name)
+colnames(Graph1)[2]<-"DC"
+
+Graph2<-subset(ticketsByState,ticketsByState$State=="DC" | ticketsByState$State=="VA" | ticketsByState$State=="MD")[c(2,3:4,7)]
+Graph2Pop<-merge(Graph2,areaT,by=c("State","Year"))
+Graph2Pop$ticketPerCapita<-round(Graph2Pop$Tickets/(as.numeric(as.character(Graph2Pop$Pop))),2)
+Graph2Pop<-Graph2Pop[c(2,4,6)]
+Graph2<-melt(Graph2Pop,id.vars=c("state.name","Year"))
+Graph2<-cast(Graph2,Year~state.name)
+colnames(Graph2)[2]<-"DC"
+
+write.csv(Graph1,"Graph1.csv",row.names=FALSE)
+write.csv(Graph2,"Graph2.csv",row.names=FALSE)
+
+map<-aggregate(list(Tickets=ticketsByState$Tickets,Fines=ticketsByState$Fines),
                by=list(State=ticketsByState$state.name), FUN=mean)
+map$Tickets<-round(map$Tickets,0)
+map$Fines<-round(map$Fines,2)
 stateMap<-readOGR("http://eric.clst.org/wupl/Stuff/gz_2010_us_040_00_5m.json", "OGRGeoJSON")
 colnames(map)[c(1)]<-"NAME"
 StatePTMap<-merge(stateMap,map,by="NAME",all.y=TRUE)
