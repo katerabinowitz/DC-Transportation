@@ -15,3 +15,11 @@ Data analysis + visualization related to DC transportation for www.datalensdc.co
   Source: [WMATA PlanItMetro blog data release] (http://planitmetro.com/2016/03/24/data-download-metrorail-ridership-by-station-by-month-2010-2015/)
   
   Result: http://www.datalensdc.com/metro-ridership.html
+  
+#####Parking Tickets (folder): DC Parking Tickets Issued 2013-15
+
+  Source:   [opendata.dc.gov] (http://opendata.dc.gov/datasets?q=parking+tickets&sort_by=relevance)
+            [MPD Ticket Violations] (http://68.100.168.134:8080/mpd/listinfractions.jsp)
+            [Census Population Estimates] (http://www.census.gov/popest/)
+  
+  Result: http://www.datalensdc.com/parking-tickets-by-state.html
