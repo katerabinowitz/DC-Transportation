@@ -19,9 +19,9 @@ Data analysis + visualization related to DC transportation for www.datalensdc.co
 #####Parking Tickets (folder): DC Parking Tickets Issued 2013-15
 
   Source:   [opendata.dc.gov] (http://opendata.dc.gov/datasets?q=parking+tickets&sort_by=relevance)
-            
-            [MPD Ticket Violations] (http://68.100.168.134:8080/mpd/listinfractions.jsp)
-            
-            [Census Population Estimates] (http://www.census.gov/popest/)
+
+  [MPD Ticket Violations] (http://68.100.168.134:8080/mpd/listinfractions.jsp)
+
+  [Census Population Estimates] (http://www.census.gov/popest/)
   
   Result: http://www.datalensdc.com/parking-tickets-by-state.html
