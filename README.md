@@ -3,6 +3,12 @@ Data analysis + visualization related to DC transportation for www.datalensdc.co
 
 ##### Topics:
 
+##### Pedestrian Crashes (folder): Pedestrians impacted by crashes
+
+  Source: http://opendata.dc.gov/datasets/crashes-in-the-district-of-columbia
+  
+  Result: http://www.datalensdc.com/vizOpenData.html
+
 ##### Uber Surge Patterns (folder): When and by how much Uber surges across different DC neighborhoods
 
   Source: https://github.com/comp-journalism/2016-03-wapo-uber
